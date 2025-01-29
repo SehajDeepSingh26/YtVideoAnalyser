@@ -33,6 +33,8 @@ app.post('/get-transcript', async (req, res) => {
                 temperature: 0.7,
             }),
         });
+        console.log("getting summary")
+        console.log(summaryResponse);
 
         const summary = await summaryResponse.json();
 
@@ -56,37 +58,45 @@ app.post('/chat', async (req, res) => {
         if (!transcript || !userInput) {
             return res.status(400).json({ error: 'Transcript and user input are required.' });
         }
-        // console.log(process.env.DEEPSEEK_API_KEY)
 
         const response = await fetch('https://api.deepseek.com/chat/completions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer sk-e8be341407c049d4ac2c444616570197`, // API key from .env
+                'Authorization': `Bearer sk-e8be341407c049d4ac2c444616570197`,
             },
             body: JSON.stringify({
                 model: "deepseek-chat",
                 messages: [
                     {
                         role: "user",
-                        content: `Here is the transcript of the YouTube video: ${transcript} now a user wants to ask a question: ${userInput}. Give an appropriate response relevant to the video.`,
+                        content: `Here is the transcript of the YouTube video: ${transcript}. Now a user wants to ask a question: ${userInput}. Provide an appropriate response relevant to the video. If the information is not described in the video, perform a web search to get the information, but specify that it was found on the web.`,
                     },
                 ],
                 temperature: 0.7,
             }),
         });
 
-        const result = await response.json();
-        // console.log(result.choices[0].message)
-        res.json(
-            { 
-                response: result.choices[0].message || 'No response from AI.'
-             }
-        );
+        if (!response.ok) {
+            throw new Error(`Failed to fetch chat response: ${response.statusText}`);
+        }
+
+        let result;
+        try {
+            result = await response.json();
+        } 
+        catch (jsonError) {
+            throw new Error('Failed to parse JSON response from DeepSeek API.', jsonError);
+        }
+
+        res.json({
+            response: result?.choices[0]?.message ,
+        });
     } catch (error) {
-        console.error('Error during chat interaction:', error);
-        res.status(500).json({ error: 'An error occurred while communicating with DeepSeek AI.' });
+        console.error('Error during chat interaction:', error.message);
+        res.status(500).json({ error: error.message || 'An error occurred while communicating with DeepSeek AI.' });
     }
 });
+
 
 app.listen(5000, () => console.log('Server running on port 5000'));
