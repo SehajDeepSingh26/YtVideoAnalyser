@@ -1,6 +1,10 @@
+/* eslint-disable no-undef */
 import express from 'express';
 import { YoutubeTranscript } from 'youtube-transcript';
 import cors from "cors"
+import  dotenv  from 'dotenv';
+
+dotenv.config()
 
 const app = express();
 
@@ -20,7 +24,7 @@ app.post('/get-transcript', async (req, res) => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer sk-e8be341407c049d4ac2c444616570197`, // API key from .env
+                'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`, // API key from .env
             },
             body: JSON.stringify({
                 model: "deepseek-chat",
@@ -63,14 +67,14 @@ app.post('/chat', async (req, res) => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer sk-e8be341407c049d4ac2c444616570197`,
+                'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`,
             },
             body: JSON.stringify({
                 model: "deepseek-chat",
                 messages: [
                     {
                         role: "user",
-                        content: `Here is the transcript of the YouTube video: ${transcript}. Now a user wants to ask a question: ${userInput}. Provide an appropriate response relevant to the video. If the information is not described in the video, perform a web search to get the information, but specify that it was found on the web.`,
+                        content: `Here is the transcript of the YouTube video: ${transcript}. Now a user wants to ask a question: ${userInput}. Provide an appropriate 4-5 line response relevant to the video. If the information is not described in the video, perform a web search to get the information, but specify that it was found on the web. But the answer may be outdated.`,
                     },
                 ],
                 temperature: 0.7,

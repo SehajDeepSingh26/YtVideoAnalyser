@@ -76,12 +76,18 @@ const VideoSummarizer = () => {
         }
     };
 
+    const removeSummary = () => {
+        console.log("----------------------------------")
+        setSummary("")
+        setUrl("")
+    }
+
     return (
         <div className="w-screen h-screen bg-[#0F0F0F] text-white flex flex-col">
             {/* Navbar */}
             <nav className="w-full bg-[#181818] flex items-center justify-between p-4 fixed top-0 z-50 shadow-lg">
                 {/* Logo */}
-                <div className="text-red-600 text-2xl font-bold">YouSummarize</div>
+                <div className="text-red-600 text-2xl font-bold" onClick={removeSummary}>YouSummarize</div>
 
                 {/* Search Bar */}
                 <div className="flex items-center bg-[#121212] border border-gray-600 rounded-full px-4 py-2 w-1/3">
